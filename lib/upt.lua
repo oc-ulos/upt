@@ -43,14 +43,18 @@ end
 
 ------- internal functions -------
 upt.internal = {}
+local yield = coroutine.yield
 function upt.internal.search(dbase, pattern)
   local result = db.search(dbase, pattern)
-  coroutine.yield(result)
+  yield(result)
   return "done"
 end
 
 function upt.internal.download(name)
   local url, size = db.search("remote", name, true)
+  local stream = platform.request(url)
+  yield("progress", 0)
+  local destination = upt.config.CACHE_FOLDER .. "/" .. name .. ".upk"
   return "done"
 end
 
