@@ -48,7 +48,15 @@ function db:readHeader()
   end
 end
 
-function db:addEntry()
+function db:addEntry(name, attributes)
+end
+
+function db:entries()
+  local names = {}
+  for i=1, #self.index, 1 do
+    names[i] = self.index[i].name
+  end
+  return names
 end
 
 function lib.open(path)
