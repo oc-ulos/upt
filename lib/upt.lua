@@ -28,6 +28,13 @@ local platform = require("upt."..uname.sysname:lower())
 
 local upt = {}
 
+upt.config = {
+  progress = true,
+  repos = {
+    main = "http://ulos.pickardayune.com/upt/main"
+  },
+}
+
 -------- object for doing state -------
 upt.State = {}
 

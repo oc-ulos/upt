@@ -1,4 +1,14 @@
 -- UPT "database" backend
+-- just serialized tables
+
+local lib = {}
+
+function lib.
+
+return lib
+
+-- TODO: The new one
+--[[
 -- database format: header, index, entries
 -- numbers are little-endian
 -- header:
@@ -72,3 +82,4 @@ function lib.open(path)
 end
 
 return lib
+-- ]]
