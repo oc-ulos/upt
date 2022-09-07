@@ -30,6 +30,7 @@ local upt = {}
 
 upt.config = {
   progress = true,
+  root_dir = "/",
   repos = {
     main = "http://ulos.pickardayune.com/upt/main"
   },

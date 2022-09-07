@@ -1,9 +1,15 @@
 -- UPT "database" backend
 -- just serialized tables
 
+local s = require("serialization")
+
 local lib = {}
 
-function lib.
+function lib.load(name)
+end
+
+function lib.search(name, entry)
+end
 
 return lib
 
