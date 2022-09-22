@@ -1,0 +1,63 @@
+// UPT Structure
+
+// utils:
+  upti - install package
+  uptr - remove package
+  uptg - download package
+  uptb - build package
+
+  upt - frontend for all of these
+
+
+# upti - install package
+usage: upti <pkgfile>
+installs package <pkgfile>
+
+# uptb - build package
+usage: uptb
+looks for a file named uptbuild.conf.
+from this file, reads the following fields:
+
+  name=a name here
+  authors=author1,author2,...
+  version=a version here, see "version format" below
+  license=a license here
+  description=a description here
+  
+
+// version format:
+  versions should be formatted like semantic versioning
+  however, the version parser is more loose than that
+  so e.g. 2 number fields, 4 number fields are fine
+  e.g. 20.4.5.2 is valid, and 10.8 is valid
+  0.4-alpha1 and 0.6-beta3 are valid
+  2022.06 is valid
+  2018.1 is valid
+
+// repo list format:
+  file /etc/upt/repos
+  all files in /etc/upt/repos.d
+  text file
+  foreach line:
+    repo NAME URL
+
+// package list format:
+  in /etc/upt/lists
+  text file, named 'reponame'
+  foreach line:
+    PKGNAME PKGVER SIZE:AUTHORS:DESC:LICENSE
+
+// installed package data format:
+  in /etc/upt/db/
+  foreach package:
+    text file, named 'pkgname'
+    first line:
+      PKGVER AUTHORS:DESC:LICENSE:REPO
+    foreach line:
+      OWNED_FILE
+
+packages are simple mtar files (extended to support empty directories, version code 2) structured like this:
+  directory 'files/'
+    package files as more or less a rootfs overlay, e.g. bin, sbin
+  directory 'post/'
+    postinstall scripts, run in sorted order
