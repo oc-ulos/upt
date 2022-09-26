@@ -1,6 +1,7 @@
 // UPT Structure
 
 // utils:
+  uptd - query databases
   upti - install package
   uptr - remove package
   uptg - download package
@@ -8,6 +9,8 @@
 
   upt - frontend for all of these
 
+# uptd - query databases
+usage: uptd [quert]
 
 # upti - install package
 usage: upti <pkgfile>
@@ -23,7 +26,8 @@ from this file, reads the following fields:
   version=a version here, see "version format" below
   license=a license here
   description=a description here
-  
+  srcdir=relative file path
+  preproc=script to run for every source file before copying it to the output
 
 // version format:
   versions should be formatted like semantic versioning
