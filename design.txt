@@ -10,7 +10,7 @@
   upt - frontend for all of these
 
 # uptd - query databases
-usage: uptd [quert]
+usage: uptd [query]
 
 # upti - install package
 usage: upti <pkgfile>
@@ -24,9 +24,10 @@ from this file, reads the following fields:
   name=a name here
   authors=author1,author2,...
   version=a version here, see "version format" below
+  depends=package1,package2,...
   license=a license here
   description=a description here
-  srcdir=relative file path
+  srcdir=relative file path containing source files
   preproc=script to run for every source file before copying it to the output
 
 // version format:
@@ -37,6 +38,7 @@ from this file, reads the following fields:
   0.4-alpha1 and 0.6-beta3 are valid
   2022.06 is valid
   2018.1 is valid
+  but versions must be consistent
 
 // repo list format:
   file /etc/upt/repos
@@ -45,18 +47,20 @@ from this file, reads the following fields:
   foreach line:
     repo NAME URL
 
+repositories must have a package list downloadable as `/packages.upl`, and all packages downloadable as `PKGNAME.mtar`
+
 // package list format:
   in /etc/upt/lists
   text file, named 'reponame'
   foreach line:
-    PKGNAME PKGVER SIZE:AUTHORS:DESC:LICENSE
+    PKGNAME PKGVER SIZE:AUTHORS:DEPENDS:DESC:LICENSE
 
 // installed package data format:
   in /etc/upt/db/
   foreach package:
     text file, named 'pkgname'
     first line:
-      PKGVER AUTHORS:DESC:LICENSE:REPO
+      PKGVER AUTHORS:DESC:DEPENDS:LICENSE:REPO
     foreach line:
       OWNED_FILE
 
