@@ -28,6 +28,7 @@ from this file, reads the following fields:
   license=a license here
   description=a description here
   srcdir=relative file path containing source files
+  prebuild=script to run before building
   preproc=script to run for every source file before copying it to the output
 
 // version format:
@@ -64,7 +65,7 @@ repositories must have a package list downloadable as `/packages.upl`, and all p
     foreach line:
       OWNED_FILE
 
-packages are simple mtar files (extended to support empty directories, version code 2) structured like this:
+packages are simple mtar (extended to support empty directories and whatnot, version code 2) structured like this:
   directory 'files/'
     package files as more or less a rootfs overlay, e.g. bin, sbin
   directory 'post/'
