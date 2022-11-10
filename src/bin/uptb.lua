@@ -28,6 +28,8 @@ if opts.h then
 usage: uptb [options]
 Builds UPT packages according to uptbuild.conf in the current working directory.
 
+Prints the appropriate package list entry on success.
+
 options:
 %s
 
