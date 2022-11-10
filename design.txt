@@ -16,6 +16,14 @@ usage: uptd [query]
 usage: upti <pkgfile>
 installs package <pkgfile>
 
+# uptr - remove package
+usage: upti <pkgname>
+removes package <pkgname>
+
+# uptg - download package from repository
+usage: uptg <pkgname> [dest]
+finds and downloads package <pkgname>, placing it in [dest] where [dest] is a folder.  otherwise the current working directory.
+
 # uptb - build package
 usage: uptb
 looks for a file named uptbuild.conf.
@@ -55,14 +63,14 @@ repositories must have a package list downloadable as `/packages.upl`, and all p
   in /etc/upt/lists
   text file, named 'reponame'
   foreach line:
-    PKGNAME PKGVER SIZE:AUTHORS:DEPENDS:DESC:LICENSE
+    PKGNAME PKGVER SIZE:AUTHORS:DEPENDS:LICENSE:DESC
 
 // installed package data format:
   in /etc/upt/db/
   foreach package:
     text file, named 'pkgname'
     first line:
-      PKGVER AUTHORS:DESC:DEPENDS:LICENSE:REPO
+      PKGVER AUTHORS:DEPENDS:LICENSE:REPO:DESC
     foreach line:
       OWNED_FILE
 

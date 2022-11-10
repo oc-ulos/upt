@@ -13,4 +13,15 @@ function lib.exists(file)
   return not not stat.stat(file)
 end
 
+--- Check if a file is a directory.
+-- Returns false, and an error message, if the file does not exist.
+function lib.isDirectory(file)
+  checkArg(1, file, "string")
+
+  local sx, err = stat.stat(file)
+  if not sx then return nil, err end
+
+  return stat.S_ISDIR(sx.st_mode) ~= 0
+end
+
 return lib

@@ -79,7 +79,7 @@ function lib.build(options)
   local out, err = io.open(options.name .. "-"
     .. options.version .. ".mtar", "w")
   if not out then
-    upt.throw(err)
+    return upt.throw(err)
   end
 
   local writer = mtar.writeto(out)
@@ -96,7 +96,7 @@ function lib.build(options)
 
   return string.format("%s %s %d:%s:%s:%s:%s",
     options.name, options.version, size, options.authors,
-    options.depends or "", options.description, options.license or "")
+    options.depends or "", options.license or "", options.description)
 end
 
 return lib

@@ -1,7 +1,6 @@
 #!/usr/bin/env lua
 -- uptb - the UPT Build Tool
 
---local mtar = require("libmtar")
 local upt = require("upt")
 local arg = require("argcompat")
 local getopt = require("getopt")
