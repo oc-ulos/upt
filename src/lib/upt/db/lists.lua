@@ -12,16 +12,22 @@ function dbo:retrieve(search, match)
   checkArg(1, search, "string")
   checkArg(2, match, "boolean", "nil")
 
+  local matches = {}
+
   for file in dirent.files("/etc/upt/lists/") do
     for line in io.lines("/etc/upt/lists/" .. file) do
       local name, version, size, authors, depends, license, desc =
         line:match("([^ ]+) ([^ ]+) ([^:]+):([^:]+):([^:]*):([^:]*):(.*)")
 
       if search == name or (match and name:match(search)) then
-        return name, version, size, authors, depends, license, desc
+        matches[#matches+1] = table.pack(
+          file, name, version, size, authors, depends, license, desc
+        )
       end
     end
   end
+
+  if #matches > 0 then return matches end
 
   return nil, "entry not found"
 end

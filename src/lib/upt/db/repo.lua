@@ -51,7 +51,7 @@ function dbo:retrieve(name)
   for db, data in pairs(self.data) do
     for i=1, #data, 1 do
       if data[i][1] == name then
-        return db, data[i][2]
+        return { { db, data[i][2], n = 2 } }
       end
     end
   end

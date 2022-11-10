@@ -13,6 +13,8 @@ function dbo:retrieve(search, match, full)
   checkArg(2, match, "boolean", "nil")
   checkArg(3, full, "boolean", "nil")
 
+  local matches = {}
+
   for file in dirent.files("/etc/upt/db") do
     if search == file or (match and file:match(search)) then
       local hand = assert(io.open("/etc/upt/db/"..file, "r"))
@@ -28,9 +30,17 @@ function dbo:retrieve(search, match, full)
         end
       end
 
-      return version, authors, depends, license, repo, desc, files
+      matches[#matches+1] = table.pack(
+        file, version, authors, depends, license, repo, desc, files
+      )
     end
   end
+
+  if #matches > 0 then
+    return matches
+  end
+
+  return nil, "no package found"
 end
 
 -- only adds metadata, not files.
