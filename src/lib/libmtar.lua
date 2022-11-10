@@ -109,7 +109,7 @@ function writer:add(file, path)
     },
   }
 
-  self:create(record)
+  self:create(record, statx.st_size)
 
   local handle, oerr = io.open(file, "r")
   if not handle then
@@ -137,7 +137,7 @@ local function countBytes(number)
 end
 
 --- add a custom file to the output
-function writer:create(record, data)
+function writer:create(record, datsize)
   verifyRecord(record)
 
   local tags = ""
@@ -151,9 +151,8 @@ function writer:create(record, data)
   end
 
   self.stream:write(string.pack("<I8s1s2I8",
-    8 + 1 + #record.name + 2 + #tags + 8 + #data,
-    record.name, tags, #data))
-  self.stream:write(data)
+    8 + 1 + #record.name + 2 + #tags + 8 + datsize,
+    record.name, tags, datsize))
 
   return true
 end
@@ -163,7 +162,8 @@ function writer:close()
 end
 
 --- Write MTAR data to a stream.
--- This function expects 
+-- This function expects to be given a valid file stream, such as what io.open
+-- returns.
 function lib.writeto(stream)
   stream:write(HEADER)
   return setmetatable({stream=stream}, {__index=writer})

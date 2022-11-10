@@ -28,6 +28,7 @@ from this file, reads the following fields:
   license=a license here
   description=a description here
   srcdir=relative file path containing source files
+  post=relative file path containing postinstall scripts
   prebuild=script to run before building
   preproc=script to run for every source file before copying it to the output
 

@@ -2,7 +2,7 @@
 --@module upt
 --@alias lib
 
--- This module loads other submodules from the `upt.*` namespace as-needed for speed reasons, and only nativewly provides a few common functions.  Otherwise loading the module would be quite slow.
+-- This module loads other submodules from the `upt.*` namespace as-needed for speed reasons, and only natively provides a few common functions.  Otherwise loading the module would be quite slow.
 
 local logger = require("upt.logger")
 
@@ -16,12 +16,12 @@ end
 --- Trigger a package build.
 function lib.build_package(verbose)
   local build = require("upt.build")
+  local config = require("upt.config")
 
   verbose = not not verbose
 
   local bconf = config.load("uptbuild.conf")
-  build.verify(options)
-  build.build(options)
+  return build.build(bconf)
 end
 
 return lib

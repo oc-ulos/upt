@@ -3,21 +3,25 @@
 
 --local mtar = require("libmtar")
 local upt = require("upt")
+local arg = require("argcompat")
 local getopt = require("getopt")
 
 local options, usage, condense = getopt.build {
   { "Be verbose", false, "V", "verbose" },
+  { "Be colorful", false, "c", "color" },
   { "Show UPT version", false, "v", "version" },
   { "Display this help message", false, "h", "help" },
 }
 
-local args, opts = getopt.getopt({
+local _, opts = getopt.getopt({
   options = options,
   exit_on_bad_opt = true,
   help_message = "pass '--help' for help"
-}, ...)
+}, arg.command("uptb", ...))
 
 condense(opts)
+
+require("upt.logger").setColored(opts.c)
 
 if opts.h then
   io.stderr:write(([[
@@ -37,4 +41,4 @@ if opts.v then
   os.exit(0)
 end
 
-upt.build_package(opts.V)
+print(upt.build_package(opts.V))
