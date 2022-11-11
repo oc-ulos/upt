@@ -6,7 +6,9 @@
 
 local logger = require("upt.logger")
 
-local lib = {}
+local lib = {
+  _VERSION = "$[{cat uptbuild.conf | grep version | sed 's/version=//'}]"
+}
 
 function lib.throw(...)
   logger.fail(...)

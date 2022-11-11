@@ -24,6 +24,10 @@ function lib.isDirectory(file)
   return stat.S_ISDIR(sx.st_mode) ~= 0
 end
 
+function lib.makeDirectory(file)
+  stat.mkdir(file, 0x1FF)
+end
+
 --- Combine file paths
 function lib.combine(...)
   return table.concat({...}, "/"):gsub("[/\\]+", "/")

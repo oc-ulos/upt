@@ -8,11 +8,11 @@ local getopt = require("getopt")
 
 local options, usage, condense = getopt.build {
   { "Be verbose", false, "V", "verbose" },
-  { "Be colorful", false, "c", "color" },
-  { "Use 'item' as a pattern", false, "f", "fuzzy" },
+  { "\tBe colorful", false, "c", "color" },
+  { "\tUse 'item' as a pattern", false, "f", "fuzzy" },
   { "Level of detail", "LEVEL", "m", "mode" },
   { "Show UPT version", false, "v", "version" },
-  { "Display this help message", false, "h", "help" }
+  { "\tDisplay this help message", false, "h", "help" }
 }
 
 local args, opts = getopt.getopt({

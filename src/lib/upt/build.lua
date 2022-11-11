@@ -2,8 +2,10 @@
 
 local checkArg = require("checkArg")
 local versions = require("upt.versions")
+local unistd = require("posix.unistd")
 local mtar = require("libmtar")
 local tree = require("treeutil").tree
+local stat = require("posix.sys.stat")
 local upt = require("upt")
 local fs = require("upt.filesystem")
 
@@ -72,7 +74,7 @@ function lib.build(options)
   lib.verify(options)
 
   if options.preproc then
-    fs.mkdir("./temp")
+    fs.makeDirectory("./temp")
   end
 
   -- bundle all the files into an MTAR
@@ -87,12 +89,24 @@ function lib.build(options)
   -- TODO: use preprocessor
   local files = tree("./" .. options.srcdir)
   for i=1, #files do
-    local base = files[i]:sub(#options.srcdir + 2)
-    writer:add(files[i], "/files/" .. base)
+    local file = files[i]
+    local base = file:sub(#options.srcdir + 2)
+
+    if options.preproc and files[i]:sub(-4) == ".lua" then
+      os.execute("./"..options.preproc .. " " .. files[i] .. " ./temp/tmp.lua")
+      file = "./temp/tmp.lua"
+
+      local og = stat.stat(files[i])
+      stat.chmod(file, og.st_mode)
+      unistd.chown(file, og.st_uid, og.st_gid)
+    end
+    writer:add(file, "/files/" .. base)
   end
 
   local size = out:seek("cur")
   writer:close()
+
+  os.execute("rm -r ./temp")
 
   return string.format("%s %s %d:%s:%s:%s:%s",
     options.name, options.version, size, options.authors,
