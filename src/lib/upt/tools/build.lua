@@ -106,13 +106,28 @@ function lib.build(options)
   end
 
   local size = out:seek("cur")
+  local meta = string.format("%s %s %d:%s:%s:%s:%s",
+    options.name, options.version, size, options.authors,
+    options.depends or "", options.license or "", options.description)
+
+  writer:create({
+    name = "/.meta",
+    tags = {
+      mtime = os.time(),
+      -- mode r--r--r--
+      mode  = stat.S_IFREG |
+              stat.S_IRUSR |
+              stat.S_IRGRP |
+              stat.S_IROTH
+      }
+    }, #meta)
+  out:write(meta)
+
   writer:close()
 
   os.execute("rm -r ./temp")
 
-  return string.format("%s %s %d:%s:%s:%s:%s",
-    options.name, options.version, size, options.authors,
-    options.depends or "", options.license or "", options.description)
+  return meta
 end
 
 return lib

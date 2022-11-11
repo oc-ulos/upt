@@ -118,7 +118,7 @@ if args[3] == "-strip-comments" then
   whand:close()
 end
 
-io.stderr:write("\27[95m-=> \27[39mSuccess!\n")
+--io.stderr:write("\27[95m-=> \27[39mSuccess!\n")
 
 _G.env = nil
 _G.proc = nil

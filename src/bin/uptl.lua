@@ -24,6 +24,7 @@ require("upt.logger").setColored(opts.c)
 
 if opts.v then
   print("UPT " .. upt._VERSION)
+  os.exit(0)
 end
 
 if opts.h then

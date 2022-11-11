@@ -1,14 +1,14 @@
 // UPT Structure
 
 // utils:
-  uptd - query databases
-  upti - install package
-  uptr - remove package
-  uptg - download package
-  uptb - build package
-  uptl - get package lists
+  [X] uptd - query databases
+  [ ] upti - install package
+  [ ] uptr - remove package
+  [ ] uptg - download package
+  [X] uptb - build package
+  [X] uptl - get package lists
 
-  upt - frontend for all of these
+  [ ] upt - frontend for all of these
 
 # uptd - query databases
 usage: uptd <db> <query> <item>
@@ -84,3 +84,5 @@ packages are simple mtar (extended to support empty directories and whatnot, ver
     package files as more or less a rootfs overlay, e.g. bin, sbin
   directory 'post/'
     postinstall scripts, run in sorted order
+  file '.meta'
+    package version info, in the same format as package lists
