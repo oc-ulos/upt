@@ -8,6 +8,16 @@ local lib = {}
 
 local dbo = {}
 
+function dbo:all()
+  local files = {}
+
+  for file in dirent.files("/etc/upt/db") do
+    if file ~= "." and file ~= ".." then files[#files+1] = file end
+  end
+
+  return files
+end
+
 function dbo:retrieve(search, match, full)
   checkArg(1, search, "string")
   checkArg(2, match, "boolean", "nil")

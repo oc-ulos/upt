@@ -51,12 +51,24 @@ function dbo:retrieve(name)
   for db, data in pairs(self.data) do
     for i=1, #data, 1 do
       if data[i][1] == name then
-        return { { db, data[i][2], n = 2 } }
+        return { { db, data[i][1], data[i][2], n = 3 } }
       end
     end
   end
 
   return nil, "no matching repositories"
+end
+
+function dbo:names()
+  local repos = {}
+
+  for _, data in pairs(self.data) do
+    for i=1, #data do
+      repos[#repos+1] = data[i][1]
+    end
+  end
+
+  return repos
 end
 
 function dbo:close()
@@ -78,10 +90,12 @@ local function loadRepoFile(f)
 
   for line in io.lines(f) do
     local name, url = line:match("repo ([^ ]+) ([^ ]+)")
-    if line:sub(1,1) ~= "#" and not name then
-      logger.warn("invalid repo entry: " .. line)
-    else
-      data[#data+1] = {name, url}
+    if line:sub(1,1) ~= "#" then
+      if not name then
+        logger.warn("invalid repo entry: " .. line)
+      else
+        data[#data+1] = {name, url}
+      end
     end
   end
 

@@ -6,11 +6,12 @@
   uptr - remove package
   uptg - download package
   uptb - build package
+  uptl - get package lists
 
   upt - frontend for all of these
 
 # uptd - query databases
-usage: uptd [query]
+usage: uptd <db> <query> <item>
 
 # upti - install package
 usage: upti <pkgfile>
@@ -23,6 +24,10 @@ removes package <pkgname>
 # uptg - download package from repository
 usage: uptg <pkgname> [dest]
 finds and downloads package <pkgname>, placing it in [dest] where [dest] is a folder.  otherwise the current working directory.
+
+# uptl - retrieve package lists
+usage: uptl [repo]
+updates the package list from a repository, or if none is specified updates all of them
 
 # uptb - build package
 usage: uptb

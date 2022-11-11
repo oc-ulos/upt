@@ -1,4 +1,6 @@
 -- UPT build code
+-- this is not so much intended as a real library as it is a way to organize
+-- UPT's code somewhat cleanly.
 
 local checkArg = require("checkArg")
 local versions = require("upt.versions")

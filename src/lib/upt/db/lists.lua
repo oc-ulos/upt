@@ -8,6 +8,19 @@ local lib = {}
 
 local dbo = {}
 
+function dbo:names()
+  local infos = self:retrieve(".+", true)
+  local ret = {}
+
+  if infos then
+    for i=1, #infos, 1 do
+      ret[#ret+1] = infos[i][2]
+    end
+  end
+
+  return ret
+end
+
 function dbo:retrieve(search, match)
   checkArg(1, search, "string")
   checkArg(2, match, "boolean", "nil")

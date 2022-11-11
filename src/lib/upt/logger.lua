@@ -28,6 +28,7 @@ end
 
 function lib.setColored(b)
   color = not not b
+  return not color
 end
 
 return lib

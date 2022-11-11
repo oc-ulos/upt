@@ -49,6 +49,11 @@ Copyright (c) 2022 ULOS Developers under the GNU GPLv3.
   os.exit(1)
 end
 
+if opts.v then
+  print(string.format("UPT %s", upt._VERSION))
+  os.exit(0)
+end
+
 if #args < 3 or opts.h then
   showUsage()
 end
@@ -98,8 +103,8 @@ local formats = {
     end
   end,
 
-  repo = function(_, db, url)
-    return string.format("repo %s = %s", db, url)
+  repo = function(_, db, repo, url)
+    return string.format("in %s: repo %s = %s", db, repo, url)
   end,
 }
 
@@ -119,9 +124,11 @@ if accepted[args[1]] ~= "repo" and query == "add" then
 end
 
 
-local db = require("upt.db." .. accepted[args[1]]).open()
+local db = require("upt.db." .. accepted[args[1]]).load()
 
 local result, err = db[query](db, args[3], opts.f)
+
+db:close()
 
 if not result then
   upt.throw("database query failed: " .. err)

@@ -17,7 +17,7 @@ end
 
 --- Trigger a package build.
 function lib.build_package(verbose)
-  local build = require("upt.build")
+  local build = require("upt.tools.build")
   local config = require("upt.config")
 
   verbose = not not verbose
