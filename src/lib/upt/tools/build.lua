@@ -79,6 +79,10 @@ function lib.build(options)
     fs.makeDirectory("./temp")
   end
 
+  if options.prebuild then
+    os.execute(options.prebuild)
+  end
+
   -- bundle all the files into an MTAR
   local out, err = io.open(options.name .. "-"
     .. options.version .. ".mtar", "w")
@@ -95,7 +99,7 @@ function lib.build(options)
     local base = file:sub(#options.srcdir + 2)
 
     if options.preproc and files[i]:sub(-4) == ".lua" then
-      os.execute("./"..options.preproc .. " " .. files[i] .. " ./temp/tmp.lua")
+      os.execute(options.preproc .. " " .. files[i] .. " ./temp/tmp.lua")
       file = "./temp/tmp.lua"
 
       local og = stat.stat(files[i])
