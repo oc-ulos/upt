@@ -19,7 +19,8 @@ local valid = {
   license = true,
   description = true,
   srcdir = true,
-  preproc = true
+  preproc = true,
+  prebuild = true
 }
 
 local optional = {
@@ -44,7 +45,7 @@ local verifiers = {
   depends = function(x) return type(x) == "string" end,
   license = function(_) return true end,
   description = verify_string,
-  srcdir = relative_exists,
+  srcdir = function(_) return true end,--relative_exists,
   prebuild = relative_exists,
   preproc = relative_exists
 }
@@ -83,6 +84,10 @@ function lib.build(options)
     os.execute(options.prebuild)
   end
 
+  if not relative_exists(options.srcdir) then
+    return upt.throw("options.srcdir is invalid")
+  end
+
   -- bundle all the files into an MTAR
   local out, err = io.open(options.name .. "-"
     .. options.version .. ".mtar", "w")
@@ -92,11 +97,10 @@ function lib.build(options)
 
   local writer = mtar.writeto(out)
 
-  -- TODO: use preprocessor
   local files = tree("./" .. options.srcdir)
   for i=1, #files do
     local file = files[i]
-    local base = file:sub(#options.srcdir + 2)
+    local base = file:sub(#options.srcdir + 3)
 
     if options.preproc and files[i]:sub(-4) == ".lua" then
       os.execute(options.preproc .. " " .. files[i] .. " ./temp/tmp.lua")
@@ -106,6 +110,7 @@ function lib.build(options)
       stat.chmod(file, og.st_mode)
       unistd.chown(file, og.st_uid, og.st_gid)
     end
+
     writer:add(file, "/files/" .. base)
   end
 
@@ -129,7 +134,9 @@ function lib.build(options)
 
   writer:close()
 
-  os.execute("rm -r ./temp")
+  if options.preproc then
+    os.execute("rm -r ./temp")
+  end
 
   return meta
 end

@@ -4,7 +4,7 @@
   [X] uptd - query databases
   [ ] upti - install package
   [ ] uptr - remove package
-  [ ] uptg - download package
+  [X] uptg - download package
   [X] uptb - build package
   [X] uptl - get package lists
 
