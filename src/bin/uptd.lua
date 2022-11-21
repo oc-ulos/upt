@@ -10,6 +10,7 @@ local options, usage, condense = getopt.build {
   { "Be verbose", false, "V", "verbose" },
   { "\tBe colorful", false, "c", "color" },
   { "\tUse 'item' as a pattern", false, "f", "fuzzy" },
+  { "Alternative root filesystem", "PATH", "r", "root" },
   { "Level of detail", "LEVEL", "m", "mode" },
   { "Show UPT version", false, "v", "version" },
   { "\tDisplay this help message", false, "h", "help" }
@@ -90,7 +91,9 @@ local formats = {
     elseif mode == 2 then
       return string.format(
         "%s/%s-%s\n  %s\n  author(s): %s\n  license: %s\n  depends: %s",
-        repo, name, version, desc, authors, license, depends)
+        repo, name, version, desc,
+        table.concat(authors, ", "), license,
+        table.concat(depends, ", "))
     end
   end,
 
@@ -99,7 +102,12 @@ local formats = {
     if mode == 1 then
       return string.format("%s/%s-%s\n  %s", repo, name, version, desc)
     elseif mode == 2 then
-      return string.format("%s/%s-%s\n  %s\n  size: %s\n  author(s): %s\n  license: %s\n  depends: %s\n", repo, name, version, desc, sizes.format(size), authors, license, depends)
+      return string.format(
+        "%s/%s-%s\n  %s\n  size: %s\n  author(s): %s\n" ..
+        "  license: %s\n  depends: %s\n",
+        repo, name, version, desc, sizes.format(size),
+        table.concat(authors, ", "), license,
+        table.concat(depends, ", "))
     end
   end,
 
@@ -124,7 +132,7 @@ if accepted[args[1]] ~= "repo" and query == "add" then
 end
 
 
-local db = require("upt.db." .. accepted[args[1]]).load()
+local db = require("upt.db." .. accepted[args[1]]).load(opts.r)
 
 local result, err = db[query](db, args[3], opts.f)
 

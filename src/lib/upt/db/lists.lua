@@ -1,6 +1,7 @@
 --- UPT package list databases
 
 local fs = require("upt.filesystem")
+local meta = require("upt.meta")
 local dirent = require("posix.dirent")
 local checkArg = require("checkArg")
 
@@ -27,10 +28,15 @@ function dbo:retrieve(search, match)
 
   local matches = {}
 
-  for file in dirent.files("/etc/upt/lists/") do
-    for line in io.lines("/etc/upt/lists/" .. file) do
+  local dir = fs.combine(self.root, "/etc/upt/lists")
+  for file in dirent.files(dir) do
+    for line in io.lines(fs.combine(dir, file)) do
       local name, version, size, authors, depends, license, desc =
-        line:match("([^ ]+) ([^ ]+) ([^:]+):([^:]+):([^:]*):([^:]*):(.*)")
+        table.unpack(meta.split(line))
+        --line:match("([^ ]+) ([^ ]+) ([^:]+):([^:]+):([^:]*):([^:]*):(.*)")
+
+      if depends == "" then depends = {} end
+      if type(authors) == "string" then authors = {authors} end
 
       if search == name or (match and name:match(search)) then
         matches[#matches+1] = table.pack(
@@ -56,10 +62,10 @@ end
 function dbo:close()
 end
 
-function lib.load()
-  local files = fs.list("/etc/upt/lists")
+function lib.load(root)
+  local files = fs.list(fs.combine(root or "/", "/etc/upt/lists"))
 
-  return setmetatable({files = files}, {__index = dbo})
+  return setmetatable({root = root or "/", files = files}, {__index = dbo})
 end
 
 return lib

@@ -5,9 +5,10 @@
 local checkArg = require("checkArg")
 local versions = require("upt.versions")
 local unistd = require("posix.unistd")
-local mtar = require("libmtar")
-local tree = require("treeutil").tree
 local stat = require("posix.sys.stat")
+local tree = require("treeutil").tree
+local meta = require("upt.meta")
+local mtar = require("libmtar")
 local upt = require("upt")
 local fs = require("upt.filesystem")
 
@@ -95,7 +96,7 @@ function lib.build(options)
     return upt.throw(err)
   end
 
-  local writer = mtar.writeto(out)
+  local writer = mtar.writer(out)
 
   local files = tree("./" .. options.srcdir)
   for i=1, #files do
@@ -111,11 +112,11 @@ function lib.build(options)
       unistd.chown(file, og.st_uid, og.st_gid)
     end
 
-    writer:add(file, "/files/" .. base)
+    writer:add(file, fs.combine("/files/", base))
   end
 
   local size = out:seek("cur")
-  local meta = string.format("%s %s %d:%s:%s:%s:%s",
+  local meta = meta.assemble(--string.format("%s %s %d:%s:%s:%s:%s",
     options.name, options.version, size, options.authors,
     options.depends or "", options.license or "", options.description)
 

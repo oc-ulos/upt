@@ -72,7 +72,7 @@ function dbo:names()
 end
 
 function dbo:close()
-  local hand, err = io.open("/etc/upt/repos", "w")
+  local hand, err = io.open(self.repos, "w")
   if not hand then
     return upt.throw("error saving databases - " .. err)
   end
@@ -102,11 +102,14 @@ local function loadRepoFile(f)
   return data
 end
 
-function lib.load()
-  local data = {repos = loadRepoFile("/etc/upt/repos")}
+function lib.load(root)
+  local r = fs.combine(root or "/", "/etc/upt/repos")
+  local rd = r .. ".d"
 
-  if fs.isDirectory("/etc/upt/repos.d") then
-    tree("/etc/upt/repos.d", nil, function(path)
+  local data = {repos = loadRepoFile(r)}
+
+  if fs.isDirectory(rd) then
+    tree(rd, nil, function(path)
       local name = path:match("([^/]+)/?$")
       if data[name] then
         upt.throw("identical repository db filenames - " .. name)
@@ -115,7 +118,7 @@ function lib.load()
     end)
   end
 
-  return setmetatable({data = data}, {__index = dbo})
+  return setmetatable({repos = r, data = data}, {__index = dbo})
 end
 
 return lib

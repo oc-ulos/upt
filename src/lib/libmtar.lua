@@ -48,22 +48,45 @@ local function readFileRecord(handle)
   return recsize, name, tags, datasize
 end
 
---- Iterate over all MTAR file records in the given stream.
--- The stream must be compatible with the functions provided in standard `io` library streams.
--- The returned iterator expects the calling program to read all file data before calling it again.
-function lib.iterate(stream)
-  local header = stream:read(4)
+local reader = {}
+
+function reader:verify_header()
+  self.stream:seek("set", 0)
+
+  local header = self.stream:read(4)
   if header ~= HEADER then
     error(string.format(
       "bad MTAR v2 header (expected 0xFFFF024D, got %08x)",
       string.unpack("<I8", header)))
   end
+end
 
-  return function()
-    return readFileRecord(stream)
+--- Seek to a specific MTAR file record.
+function reader:seek(file)
+  checkArg(1, file, "string")
+
+  for rec, name, tag, dat in self:iterate() do
+    if name == file then
+      return rec, name, tag, dat
+    end
+
+    self.stream:seek("cur", dat)
   end
 end
 
+--- Iterate over all MTAR file records in the reader's stream.
+-- The stream must be compatible with the functions provided in standard `io` library streams.
+-- The returned iterator expects the calling program to read all file data (or seek forward `datsize` bytes) before calling it again.
+function reader:iterate()
+  self:verify_header()
+  return function()
+    return readFileRecord(self.stream)
+  end
+end
+
+function lib.reader(stream)
+  return setmetatable({stream=stream}, {__index = reader})
+end
 
 ------
 -- Writer object returned by @{writeto}.
@@ -164,7 +187,7 @@ end
 --- Write MTAR data to a stream.
 -- This function expects to be given a valid file stream, such as what io.open
 -- returns.
-function lib.writeto(stream)
+function lib.writer(stream)
   stream:write(HEADER)
   return setmetatable({stream=stream}, {__index=writer})
 end

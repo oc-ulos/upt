@@ -8,6 +8,7 @@ local getopt = require("getopt")
 local options, usage, condense = getopt.build {
   { "Be verbose", false, "V", "verbose" },
   { "\tBe colorful", false, "c", "color" },
+  { "Alternative root filesystem", "PATH", "r", "root" },
   {"Show UPT version", false, "v", "version" },
   {"\tDisplay this help message", false, "h", "help"}
 }
@@ -42,4 +43,4 @@ Copyright (c) 2022 ULOS Developers under the GNU GPLv3.
 end
 
 local list = require("upt.tools.list")
-list.update(args)
+list.update(opts.r, args)

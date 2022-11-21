@@ -13,6 +13,7 @@ local unistd = require("posix.unistd")
 local options, usage, condense = getopt.build {
   { "Be verbose", false, "V", "verbose" },
   { "\tBe colorful", false, "c", "color" },
+  { "Alternative root filesystem", "PATH", "r", "root" },
   {"Show UPT version", false, "v", "version" },
   {"\tDisplay this help message", false, "h", "help"}
 }
@@ -56,7 +57,7 @@ if args[2] then
   end
 end
 
-local dbL = lists.load()
+local dbL = lists.load(opts.r)
 local entries, err = dbL:retrieve(args[1])
 
 if not entries then
@@ -70,7 +71,7 @@ local repo, pkgname, pkgver = entries[1][1], entries[1][2], entries[1][3]
 dest = fs.combine(dest, pkgname .. "-" .. pkgver .. ".mtar")
 
 -- get package URL
-local dbR = repos.load()
+local dbR = repos.load(opts.r)
 local repoent = dbR:retrieve(repo)
 
 if not repoent then
