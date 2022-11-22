@@ -40,7 +40,7 @@ Copyright (c) 2022 ULOS Developers under the GNU GPLv3.
 end
 
 if opts.v then
-  print(upt._VERSION)
+  print("UPT " .. upt._VERSION)
   os.exit(0)
 end
 

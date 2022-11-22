@@ -10,11 +10,8 @@ local fs = require("upt.filesystem")
 local lib = {}
 
 function lib.get(name, dest, root)
-  local yesDest = not not dest
   dest = dest or (root and "/") or unistd.getcwd()
   root = root or "/"
-
-  if yesDest then dest = fs.combine(root, dest) end
 
   local dbL = lists.load(root)
   local entries, err = dbL:retrieve(name)
@@ -46,7 +43,7 @@ function lib.get(name, dest, root)
     return nil, nerr
   end
 
-  return true
+  return dest
 end
 
 return lib

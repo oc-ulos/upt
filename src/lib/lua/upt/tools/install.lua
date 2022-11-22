@@ -1,7 +1,6 @@
 -- UPT package installer
 
 local installed = require("upt.db.installed")
-local lists = require("upt.db.lists")
 local logger = require("upt.logger")
 local errno = require("posix.errno")
 local stat = require("posix.sys.stat")
@@ -57,7 +56,8 @@ end
 -- @tparam[opt="/"] string root Alternative root filesystem to use
 -- @tparam[opt=0] number depcheck_mode Dependency checking mode
 function lib.install_local(file, root, depcheck_mode)
-  logger.ok("installing package '%s'", file)
+  logger.ok("%s package '%s'",
+    depcheck_mode == 1 and "checking" or "installing", file)
 
   root = root or "/"
   depcheck_mode = depcheck_mode or 0
@@ -176,7 +176,29 @@ end
 
 --- Install a package from a repository.
 function lib.install_repo(name, root, depcheck_mode)
-  
+  local get = require("upt.tools.get").get
+  root = root or "/"
+  fs.makeDirectory(fs.combine(root, "/etc/upt/cache/"))
+
+  local ok, err = get(name, "/etc/upt/cache/", root)
+  if not ok then
+    return upt.throw(err)
+  end
+  logger.ok("retrieved package '%s'", name)
+
+  if depcheck_mode < 2 then
+    local deps = lib.install_local(ok, root, 1)
+
+    if deps then
+      for i=1, #deps do
+        lib.install_repo(deps[i], root, depcheck_mode)
+      end
+    end
+  end
+
+  lib.install_local(ok, root, depcheck_mode)
+
+  os.remove(ok)
 end
 
 return lib

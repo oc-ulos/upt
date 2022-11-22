@@ -69,7 +69,7 @@ end
 function lib.load(root)
   root = root or "/"
 
-  fs.makeDirectory(fs.combine(root, "/etc/upt/lists"))
+  os.execute("mkdir -p " .. fs.combine(root, "/etc/upt/lists"))
   local files = fs.list(fs.combine(root, "/etc/upt/lists"))
 
   return setmetatable({root = root, files = files}, {__index = dbo})
