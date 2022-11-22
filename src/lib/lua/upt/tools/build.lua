@@ -9,7 +9,6 @@ local stat = require("posix.sys.stat")
 local tree = require("treeutil").tree
 local meta = require("upt.meta")
 local mtar = require("libmtar")
-local upt = require("upt")
 local fs = require("upt.filesystem")
 
 local valid = {
@@ -59,23 +58,27 @@ function lib.verify(options)
   for k, v in pairs(options) do
     k, v = tostring(k), tostring(v)
     if not valid[k] then
-      upt.throw("invalid build config key - '%s'", k)
+      return nil, string.format("invalid build config key - '%s'", k)
     end
 
     if not verifiers[k](v) then
-      upt.throw("invalid build config value - '%s' is invalid for %s", v, k)
+      return nil, string.format(
+        "invalid build config value - '%s' is invalid for %s", v, k)
     end
   end
 
   for k in pairs(valid) do
     if not (options[k] or optional[k]) then
-      upt.throw("missing build config key - '%s'", k)
+      return nil, string.format("missing build config key - '%s'", k)
     end
   end
 end
 
 function lib.build(options)
-  lib.verify(options)
+  local ok, verr = lib.verify(options)
+  if not ok then
+    return nil, verr
+  end
 
   if options.preproc then
     fs.makeDirectory("./temp")
@@ -86,14 +89,14 @@ function lib.build(options)
   end
 
   if not relative_exists(options.srcdir) then
-    return upt.throw("options.srcdir is invalid")
+    return nil, "options.srcdir is invalid"
   end
 
   -- bundle all the files into an MTAR
   local out, err = io.open(options.name .. "-"
     .. options.version .. ".mtar", "w")
   if not out then
-    return upt.throw(err)
+    return nil, err
   end
 
   local writer = mtar.writer(out)
@@ -116,7 +119,7 @@ function lib.build(options)
   end
 
   local size = out:seek("cur")
-  local meta = meta.assemble(--string.format("%s %s %d:%s:%s:%s:%s",
+  local mdata = meta.assemble(--string.format("%s %s %d:%s:%s:%s:%s",
     options.name, options.version, size, options.authors,
     options.depends or "", options.license or "", options.description)
 
@@ -130,8 +133,8 @@ function lib.build(options)
               stat.S_IRGRP |
               stat.S_IROTH
       }
-    }, #meta)
-  out:write(meta)
+    }, #mdata)
+  out:write(mdata)
 
   writer:close()
 

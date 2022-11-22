@@ -3,7 +3,6 @@
 local lib = {}
 
 local sys = require("syscalls")
-local stdio = require("posix.stdio")
 local checkArg = require("checkArg")
 
 function lib.retrieve(url, file)

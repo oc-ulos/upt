@@ -4,7 +4,6 @@ local unistd = require("posix.unistd")
 local lists = require("upt.db.lists")
 local repos = require("upt.db.repo")
 local net = require("upt.network")
-local upt = require("upt")
 local fs = require("upt.filesystem")
 
 local lib = {}
@@ -20,7 +19,7 @@ function lib.get(name, dest, root)
     return nil, err
 
   elseif #entries > 1 then
-    upt.throw("TODO: handle multiple identical package entries")
+    return nil, "TODO: handle multiple identical package entries"
   end
 
   local repo, pkgname, pkgver = entries[1][1], entries[1][2], entries[1][3]

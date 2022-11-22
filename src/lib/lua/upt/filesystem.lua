@@ -26,7 +26,9 @@ function lib.isDirectory(file)
   return stat.S_ISDIR(sx.st_mode) ~= 0
 end
 
-function lib.makeDirectory(file)
+--- Create a directory, recursively.
+-- Optionally performs some action when directories are newly created.
+function lib.makeDirectory(file, on_new)
   checkArg(1, file, "string")
   local path = file:sub(1,1) == "/" and "/" or "./"
 
@@ -35,6 +37,8 @@ function lib.makeDirectory(file)
     local ok, err, eno = stat.mkdir(path, 0x1FF)
     if not ok and eno ~= errno.EEXIST then
       return ok, err, eno
+    elseif on_new then
+      pcall(on_new, path)
     end
   end
 

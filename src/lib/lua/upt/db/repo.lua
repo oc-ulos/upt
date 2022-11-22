@@ -74,7 +74,7 @@ end
 function dbo:close()
   local hand, err = io.open(self.repos, "w")
   if not hand then
-    return upt.throw("error saving databases - " .. err)
+    return nil, "error saving databases - " .. err
   end
 
   for i=1, #self.data.repos do
@@ -112,7 +112,7 @@ function lib.load(root)
     tree(rd, nil, function(path)
       local name = path:match("([^/]+)/?$")
       if data[name] then
-        upt.throw("identical repository db filenames - " .. name)
+        return nil, "identical repository db filenames - " .. name
       end
       data[name] = loadRepoFile(path)
     end)

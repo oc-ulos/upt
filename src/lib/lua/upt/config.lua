@@ -1,11 +1,9 @@
-local upt = require("upt")
-
 local lib = {}
 
 function lib.load(path)
   local conf, err = io.open(path, "r")
   if not conf then
-    return upt.throw(err)
+    return nil, err
   end
 
   local options = {}

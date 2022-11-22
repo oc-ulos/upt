@@ -51,7 +51,7 @@ Copyright (c) 2022 ULOS Developers under the GNU GPLv3.
 end
 
 if opts.v then
-  print(string.format("UPT %s", upt._VERSION))
+  print("UPT " .. upt._VERSION)
   os.exit(0)
 end
 
@@ -86,11 +86,11 @@ local formats = {
   installed = function(mode, name, version, authors, depends,
       license, repo, desc)
     if mode == 1 then
-      return string.format("%s/%s-%s\n  %s",
+      return string.format("%s/%s %s\n  %s",
         repo, name, version, desc)
     elseif mode == 2 then
       return string.format(
-        "%s/%s-%s\n  %s\n  author(s): %s\n  license: %s\n  depends: %s",
+        "%s/%s %s\n  %s\n  author(s): %s\n  license: %s\n  depends: %s",
         repo, name, version, desc,
         table.concat(authors, ", "), license,
         table.concat(depends, ", "))
@@ -100,10 +100,10 @@ local formats = {
   lists = function(mode, repo, name, version, size, authors,
       depends, license, desc)
     if mode == 1 then
-      return string.format("%s/%s-%s\n  %s", repo, name, version, desc)
+      return string.format("%s/%s %s\n  %s", repo, name, version, desc)
     elseif mode == 2 then
       return string.format(
-        "%s/%s-%s\n  %s\n  size: %s\n  author(s): %s\n" ..
+        "%s/%s %s\n  %s\n  size: %s\n  author(s): %s\n" ..
         "  license: %s\n  depends: %s\n",
         repo, name, version, desc, sizes.format(size),
         table.concat(authors, ", "), license,

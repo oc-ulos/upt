@@ -43,4 +43,7 @@ Copyright (c) 2022 ULOS Developers under the GNU GPLv3.
 end
 
 local list = require("upt.tools.list")
-list.update(opts.r, args)
+local ok, err = list.update(opts.r, args)
+if not ok and err then
+  upt.throw(err)
+end

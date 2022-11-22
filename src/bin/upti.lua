@@ -62,8 +62,12 @@ for i=1, #args do
     func = installer.install_repo
   end
 
-  local result = func(args[i], opts.r,
+  local result, err = func(args[i], opts.r,
       (opts.d and 1) or (opts.D and 2) or 0)
+
+  if not result then
+    return upt.throw(err)
+  end
 
   if type(result) == "table" then
     print("package " .. args[i] .. " requires:\n  ",

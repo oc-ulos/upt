@@ -34,10 +34,10 @@ function dbo:retrieve(search, match)
       for line in io.lines(fs.combine(dir, file)) do
         local name, version, size, authors, depends, license, desc =
           table.unpack(meta.split(line))
-        --line:match("([^ ]+) ([^ ]+) ([^:]+):([^:]+):([^:]*):([^:]*):(.*)")
 
         if depends == "" then depends = {} end
         if type(depends) == "string" then depends = {depends} end
+
         if authors == "" then authors = {} end
         if type(authors) == "string" then authors = {authors} end
 

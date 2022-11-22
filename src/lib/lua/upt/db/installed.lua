@@ -34,9 +34,11 @@ function dbo:retrieve(search, match, full)
 
       local version, authors, depends, license, repo, desc =
         table.unpack(meta.split(first))
-        --first:match("([^ ]+) ([^:]+):([^:]*):([^:]*)([^:]+):(.*)")
 
       if depends == "" then depends = {} end
+      if type(depends) == "string" then depends = {depends} end
+
+      if authors == "" then authors = {} end
       if type(authors) == "string" then authors = {authors} end
 
       local files = {}
@@ -63,13 +65,13 @@ end
 function dbo:add(name, version, authors, depends, license, repo, desc)
   checkArg(1, name, "string")
   checkArg(2, version, "string")
-  checkArg(3, authors, "string", "table")
-  checkArg(4, depends, "string", "table", "nil")
+  checkArg(3, authors, "table")
+  checkArg(4, depends, "table", "nil")
   checkArg(5, license, "string", "nil")
   checkArg(6, repo, "string")
   checkArg(7, desc, "string", "nil")
 
-  depends = depends or ""
+  depends = depends or {}
   license = license or ""
   desc = desc or ""
 

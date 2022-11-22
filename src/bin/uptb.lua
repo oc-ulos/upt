@@ -38,8 +38,12 @@ Copyright (c) 2022 ULOS Developers under the GNU GPLv3.
 end
 
 if opts.v then
-  print(string.format("UPT %s", upt._VERSION))
+  print("UPT " .. upt._VERSION)
   os.exit(0)
 end
 
-print(upt.build_package(opts.V))
+local ok, err = upt.build_package(opts.V)
+if not ok then
+  upt.throw(err)
+end
+print(ok)

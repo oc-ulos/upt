@@ -6,7 +6,6 @@ local errno = require("posix.errno")
 local stat = require("posix.sys.stat")
 local meta = require("upt.meta")
 local mtar = require("libmtar")
-local upt = require("upt")
 local fs = require("upt.filesystem")
 
 local lib = {}
@@ -64,14 +63,14 @@ function lib.install_local(file, root, depcheck_mode)
 
   local handle, err = io.open(file, "r")
   if not handle then
-    return nil, upt.throw(err)
+    return nil, err
   end
 
   local reader = mtar.reader(handle)
 
   local metadata = { reader:seek("/meta") }
   if #metadata == 0 then
-    return upt.throw("package '%s' is missing /meta", file)
+    return nil, string.format("package '%s' is missing /meta", file)
   end
 
   -- read and parse metadata from the package
@@ -79,18 +78,22 @@ function lib.install_local(file, root, depcheck_mode)
   if metadata[4] == "" then metadata[4] = {} end
   if type(metadata[4]) == "string" then metadata[4] = {metadata[4]} end
 
+  if metadata[5] == "" then metadata[5] = {} end
+  if type(metadata[5]) == "string" then metadata[5] = {metadata[5]} end
+
   local db = installed.load(root)
 
   logger.ok("checking dependencies")
   if depcheck_mode == 0 then -- depcheck mode 0: error on unmet dependencies
-    local depends = depcheck(metadata[1], db, metadata[4])
+    local depends = depcheck(metadata[1], db, metadata[5])
 
     if #depends > 0 then
-      upt.throw("unmet dependencies: %s", table.concat(depends, ", "))
+      return nil, string.format("unmet dependencies: %s",
+        table.concat(depends, ", "))
     end
 
   elseif depcheck_mode == 1 then -- depcheck mode 1: return unmet dependencies
-    return depcheck(metadata[1], db, metadata[4])
+    return depcheck(metadata[1], db, metadata[5])
 
   elseif depcheck_mode == 2 then -- depcheck mode 2: skip dependency checking
     logger.warn("installing package '%s' without checking dependencies", file)
@@ -107,18 +110,18 @@ function lib.install_local(file, root, depcheck_mode)
     metadata[6], "local", metadata[7])
 
   if not _ then
-    return upt.throw(datapath)
+    return nil, datapath
   end
 
   -- sometimes i love my LSP.
   -- this is not one of those times.
   if not datapath then
-    return upt.throw("somehow datapath is missing")
+    return nil, "somehow datapath is missing"
   end
 
   local dbhandle, dberr = io.open(datapath, "a")
   if not dbhandle then
-    return upt.throw(dberr)
+    return nil, dberr
   end
 
   logger.ok("extracting package")
@@ -129,10 +132,15 @@ function lib.install_local(file, root, depcheck_mode)
     if name:sub(1, 6) == "/files" then
       if tags.mode and stat.S_ISDIR(tags.mode) ~= 0 then
         local path = fs.combine(root, name:sub(7))
-        local result, derr, eno = fs.makeDirectory(path)
+
+        local result, derr, eno = fs.makeDirectory(path, function(f)
+          dbhandle:write(f:sub(#root+1).."\n")
+        end)
+
         if not result and eno ~= errno.EEXIST then
-          return upt.throw("Directory creation failed: " .. derr)
+          return nil, "Directory creation failed: " .. derr
         end
+
       else
         local path = fs.combine(root, name:sub(7))
         local whandle, werr = io.open(path, "w")
@@ -140,7 +148,7 @@ function lib.install_local(file, root, depcheck_mode)
         if not whandle then
           handle:close()
           dbhandle:close()
-          return upt.throw(werr)
+          return nil, werr
         end
 
         dbhandle:write(name:sub(7) .. "\n")
@@ -176,12 +184,12 @@ function lib.install_local(file, root, depcheck_mode)
 
     local func, lerr = load(data, "="..pi[1], "t", _G)
     if not func then
-      upt.fail("load error: %s", lerr)
+      logger.fail("load error: %s", lerr)
     else
 
       local ok, perr = pcall(func)
       if not ok and perr then
-        upt.fail("script error: %s", perr)
+        logger.fail("script error: %s", perr)
       end
     end
   end
@@ -200,7 +208,7 @@ function lib.install_repo(name, root, depcheck_mode)
 
   local ok, err = get(name, "/etc/upt/cache/", root)
   if not ok then
-    return upt.throw(err)
+    return nil, err
   end
   logger.ok("retrieved package '%s'", name)
 
