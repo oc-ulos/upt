@@ -1,6 +1,7 @@
 -- UPT package installer
 
 local installed = require("upt.db.installed")
+local lists = require("upt.db.lists")
 local logger = require("upt.logger")
 local errno = require("posix.errno")
 local stat = require("posix.sys.stat")
@@ -173,8 +174,8 @@ function lib.install_local(file, root, depcheck_mode)
   return true
 end
 
---- Install a package from the repo.
-function lib.install_repo()
+--- Install a package from a repository.
+function lib.install_repo(name, root, depcheck_mode)
 end
 
 return lib

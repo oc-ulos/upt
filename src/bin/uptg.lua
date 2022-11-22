@@ -2,10 +2,9 @@
 -- uptg - download packages
 
 local upt = require("upt")
-local net = require("upt.network")
+local get = require("upt.tools.get")
+
 local fs = require("upt.filesystem")
-local repos = require("upt.db.repo")
-local lists = require("upt.db.lists")
 local arg = require("argcompat")
 local getopt = require("getopt")
 local unistd = require("posix.unistd")
@@ -57,32 +56,5 @@ if args[2] then
   end
 end
 
-local dbL = lists.load(opts.r)
-local entries, err = dbL:retrieve(args[1])
-
-if not entries then
-  return upt.throw(err)
-
-elseif #entries > 1 then
-  upt.throw("TODO: handle multiple identical package entries")
-end
-
-local repo, pkgname, pkgver = entries[1][1], entries[1][2], entries[1][3]
-dest = fs.combine(dest, pkgname .. "-" .. pkgver .. ".mtar")
-
--- get package URL
-local dbR = repos.load(opts.r)
-local repoent = dbR:retrieve(repo)
-
-if not repoent then
-  return upt.throw("repository not present for given package")
-end
-
-local baseurl = repoent[1][3]
-
-local ok, nerr = net.retrieve(
-  baseurl .. "/" .. pkgname .. "-" .. pkgver .. ".mtar", dest)
-
-if not ok then
-  upt.throw(nerr)
-end
+local ok, err = get.get(args[1], dest, opts.r)
+if not ok then upt.throw(err) end
