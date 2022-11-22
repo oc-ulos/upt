@@ -63,8 +63,8 @@ end
 function dbo:add(name, version, authors, depends, license, repo, desc)
   checkArg(1, name, "string")
   checkArg(2, version, "string")
-  checkArg(3, authors, "string")
-  checkArg(4, depends, "string", "nil")
+  checkArg(3, authors, "string", "table")
+  checkArg(4, depends, "string", "table", "nil")
   checkArg(5, license, "string", "nil")
   checkArg(6, repo, "string")
   checkArg(7, desc, "string", "nil")
@@ -84,13 +84,12 @@ function dbo:add(name, version, authors, depends, license, repo, desc)
     return nil, oerr
   end
 
-  handle:write(meta.assemble(version, authors, depends, license, repo, desc))
-    --string.format("%s %s:%s:%s:%s:%s", version, authors, depends,
-    --license, repo, desc))
+  handle:write(meta.assemble(version, authors, depends,
+    license, repo, desc).."\n")
 
   handle:close()
 
-  return true
+  return true, path
 end
 
 -- does not remove package files from the disk, only removes db entries.
@@ -106,7 +105,9 @@ function dbo:close()
 end
 
 function lib.load(root)
-  checkArg(1, root, "string")
+  checkArg(1, root, "string", "nil")
+
+  fs.makeDirectory(fs.combine(root or "/", "/etc/upt/db"))
   return setmetatable({root=root or "/"}, {__index = dbo})
 end
 

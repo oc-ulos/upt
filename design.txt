@@ -2,7 +2,7 @@
 
 // utils:
   [X] uptd - query databases
-  [ ] upti - install package
+  [X] upti - install package
   [ ] uptr - remove package
   [X] uptg - download package
   [X] uptb - build package

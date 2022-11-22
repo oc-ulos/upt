@@ -3,8 +3,10 @@
 local lib = {}
 
 local function split_on(str, c)
+  str = str:gsub("%" .. c .. "%" .. c, c .. "!#!" .. c)
   local parts = {}
   for part in str:gmatch("[^%"..c.."]+") do
+    if part == "!#!" then part = "" end
     parts[#parts+1] = part
   end
   return parts

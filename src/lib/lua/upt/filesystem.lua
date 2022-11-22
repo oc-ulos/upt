@@ -4,6 +4,7 @@
 
 local checkArg = require("checkArg")
 local dirent = require("posix.dirent")
+local errno = require("posix.errno")
 local stat = require("posix.sys.stat")
 
 local lib = {}
@@ -26,7 +27,18 @@ function lib.isDirectory(file)
 end
 
 function lib.makeDirectory(file)
-  return stat.mkdir(file, 0x1FF)
+  checkArg(1, file, "string")
+  local path = file:sub(1,1) == "/" and "/" or "./"
+
+  for segment in file:gmatch("[^/\\]+") do
+    path = path .. segment .. "/"
+    local ok, err, eno = stat.mkdir(path, 0x1FF)
+    if not ok and eno ~= errno.EEXIST then
+      return ok, err, eno
+    end
+  end
+
+  return true
 end
 
 function lib.list(dir)

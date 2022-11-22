@@ -76,20 +76,21 @@ function lib.install_local(file, root, depcheck_mode)
 
   -- read and parse metadata from the package
   metadata = meta.split(handle:read(metadata[4]))
-  if type(metadata[5]) == "string" then metadata[5] = {} end
+  if metadata[4] == "" then metadata[4] = {} end
+  if type(metadata[4]) == "string" then metadata[4] = {metadata[4]} end
 
   local db = installed.load(root)
 
   logger.ok("checking dependencies")
   if depcheck_mode == 0 then -- depcheck mode 0: error on unmet dependencies
-    local depends = depcheck(metadata[1], db, metadata[5])
+    local depends = depcheck(metadata[1], db, metadata[4])
 
     if #depends > 0 then
       upt.throw("unmet dependencies: %s", table.concat(depends, ", "))
     end
 
   elseif depcheck_mode == 1 then -- depcheck mode 1: return unmet dependencies
-    return depcheck(metadata[1], db, metadata[5])
+    return depcheck(metadata[1], db, metadata[4])
 
   elseif depcheck_mode == 2 then -- depcheck mode 2: skip dependency checking
     logger.warn("installing package '%s' without checking dependencies", file)
@@ -100,6 +101,26 @@ function lib.install_local(file, root, depcheck_mode)
 
   local postinstalls = {}
 
+  db:remove(metadata[1])
+  local _, datapath = db:add(
+    metadata[1], metadata[2], metadata[4], metadata[5],
+    metadata[6], "local", metadata[7])
+
+  if not _ then
+    return upt.throw(datapath)
+  end
+
+  -- sometimes i love my LSP.
+  -- this is not one of those times.
+  if not datapath then
+    return upt.throw("somehow datapath is missing")
+  end
+
+  local dbhandle, dberr = io.open(datapath, "a")
+  if not dbhandle then
+    return upt.throw(dberr)
+  end
+
   logger.ok("extracting package")
   for _, name, tags, ds in reader:iterate() do
     if name == "/meta" then break end
@@ -107,27 +128,22 @@ function lib.install_local(file, root, depcheck_mode)
     -- literal file for the filesystem
     if name:sub(1, 6) == "/files" then
       if tags.mode and stat.S_ISDIR(tags.mode) ~= 0 then
-        local path = fs.combine("/", root)
-
-        for segment in name:gmatch("[^/\\]+") do
-          if segment ~= "files" then
-            path = path .. segment .. "/"
-
-            local result, derr, eno = fs.makeDirectory(path)
-            if not result and eno ~= errno.EEXIST then
-              logger.fail("!! DIRECTORY CREATION FAILED !!")
-              upt.throw(derr)
-            end
-          end
+        local path = fs.combine(root, name:sub(7))
+        local result, derr, eno = fs.makeDirectory(path)
+        if not result and eno ~= errno.EEXIST then
+          return upt.throw("Directory creation failed: " .. derr)
         end
-
       else
         local path = fs.combine(root, name:sub(7))
         local whandle, werr = io.open(path, "w")
 
         if not whandle then
+          handle:close()
+          dbhandle:close()
           return upt.throw(werr)
         end
+
+        dbhandle:write(name:sub(7) .. "\n")
 
         repeat
           local diff = math.min(2048, ds)
@@ -142,6 +158,8 @@ function lib.install_local(file, root, depcheck_mode)
       postinstalls[#postinstalls+1] = { name, handle:seek("cur"), ds }
     end
   end
+
+  dbhandle:close()
 
   logger.ok("running postinstall scripts")
 
