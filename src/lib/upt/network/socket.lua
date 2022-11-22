@@ -10,7 +10,7 @@ function lib.retrieve(url, file)
   checkArg(2, file, "string")
 
   local data, code = http.request(url)
-  if code < 300 or code > 399 then
+  if code < 200 or code > 299 then
     return nil, "HTTP error " .. tostring(code)
   end
 

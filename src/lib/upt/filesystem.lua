@@ -2,8 +2,9 @@
 -- @module upt.filesystem
 -- @alias lib
 
-local stat = require("posix.sys.stat")
 local checkArg = require("checkArg")
+local dirent = require("posix.dirent")
+local stat = require("posix.sys.stat")
 
 local lib = {}
 
@@ -28,9 +29,18 @@ function lib.makeDirectory(file)
   return stat.mkdir(file, 0x1FF)
 end
 
+function lib.list(dir)
+  checkArg(1, dir, "string")
+  local files = dirent.dir(dir)
+  table.sort(files)
+  if files[1] == "." then table.remove(files, 1) end
+  if files[1] == ".." then table.remove(files, 1) end
+  return files
+end
+
 --- Combine file paths
 function lib.combine(...)
-  return table.concat({...}, "/"):gsub("[/\\]+", "/")
+  return (table.concat({...}, "/"):gsub("[/\\]+", "/"))
 end
 
 return lib

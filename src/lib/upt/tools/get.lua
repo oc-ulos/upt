@@ -1,5 +1,6 @@
 -- upt.get
 
+local unistd = require("posix.unistd")
 local lists = require("upt.db.lists")
 local repos = require("upt.db.repo")
 local net = require("upt.network")
@@ -10,7 +11,7 @@ local lib = {}
 
 function lib.get(name, dest, root)
   local yesDest = not not dest
-  dest = dest or (root and "/")
+  dest = dest or (root and "/") or unistd.getcwd()
   root = root or "/"
 
   if yesDest then dest = fs.combine(root, dest) end
@@ -26,7 +27,7 @@ function lib.get(name, dest, root)
   end
 
   local repo, pkgname, pkgver = entries[1][1], entries[1][2], entries[1][3]
-  dest = fs.combine(dest, pkgname .. "-" .. pkgver .. ".mtar")
+  dest = fs.combine(root, dest, pkgname .. "-" .. pkgver .. ".mtar")
 
   -- get package URL
   local dbR = repos.load(root)

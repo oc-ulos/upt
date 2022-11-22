@@ -176,6 +176,7 @@ end
 
 --- Install a package from a repository.
 function lib.install_repo(name, root, depcheck_mode)
+  
 end
 
 return lib

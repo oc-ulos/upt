@@ -30,18 +30,22 @@ function dbo:retrieve(search, match)
 
   local dir = fs.combine(self.root, "/etc/upt/lists")
   for file in dirent.files(dir) do
-    for line in io.lines(fs.combine(dir, file)) do
-      local name, version, size, authors, depends, license, desc =
-        table.unpack(meta.split(line))
+    if file ~= "." and file ~= ".." then
+      for line in io.lines(fs.combine(dir, file)) do
+        local name, version, size, authors, depends, license, desc =
+          table.unpack(meta.split(line))
         --line:match("([^ ]+) ([^ ]+) ([^:]+):([^:]+):([^:]*):([^:]*):(.*)")
 
-      if depends == "" then depends = {} end
-      if type(authors) == "string" then authors = {authors} end
+        if depends == "" then depends = {} end
+        if type(depends) == "string" then depends = {depends} end
+        if authors == "" then authors = {} end
+        if type(authors) == "string" then authors = {authors} end
 
-      if search == name or (match and name:match(search)) then
-        matches[#matches+1] = table.pack(
-          file, name, version, size, authors, depends, license, desc
-        )
+        if search == name or (match and name:match(search)) then
+          matches[#matches+1] = table.pack(
+            file, name, version, size, authors, depends, license, desc
+          )
+        end
       end
     end
   end
@@ -63,9 +67,12 @@ function dbo:close()
 end
 
 function lib.load(root)
-  local files = fs.list(fs.combine(root or "/", "/etc/upt/lists"))
+  root = root or "/"
 
-  return setmetatable({root = root or "/", files = files}, {__index = dbo})
+  fs.makeDirectory(fs.combine(root, "/etc/upt/lists"))
+  local files = fs.list(fs.combine(root, "/etc/upt/lists"))
+
+  return setmetatable({root = root, files = files}, {__index = dbo})
 end
 
 return lib

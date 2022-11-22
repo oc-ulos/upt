@@ -10,6 +10,7 @@ local lib = {}
 local function update(root, db, name)
   local info = db:retrieve(name)[1]
   local url = info[3]
+  fs.makeDirectory(fs.combine(root, "/etc/upt/lists"))
   local fpath = fs.combine(root, "/etc/upt/lists/", name)
   local pkgurl = url .. "/packages.upl"
   return net.retrieve(pkgurl, fpath)

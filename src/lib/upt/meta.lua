@@ -4,7 +4,7 @@ local lib = {}
 
 local function split_on(str, c)
   local parts = {}
-  for part in str:gmatch("[^%"..c.."]") do
+  for part in str:gmatch("[^%"..c.."]+") do
     parts[#parts+1] = part
   end
   return parts

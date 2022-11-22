@@ -19,7 +19,7 @@ local options, usage, condense = getopt.build {
 local args, opts = getopt.getopt({
   options = options,
   exit_on_bad_opt = true,
-  help_message = "pass '--help' for help"
+  help_message = "pass '--help' for help\n"
 }, arg.command("uptd", ...))
 
 condense(opts)

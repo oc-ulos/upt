@@ -7,7 +7,6 @@ local get = require("upt.tools.get")
 local fs = require("upt.filesystem")
 local arg = require("argcompat")
 local getopt = require("getopt")
-local unistd = require("posix.unistd")
 
 local options, usage, condense = getopt.build {
   { "Be verbose", false, "V", "verbose" },
@@ -20,7 +19,7 @@ local options, usage, condense = getopt.build {
 local args, opts = getopt.getopt({
   options = options,
   exit_on_bad_opt = true,
-  help_message = "pass '--help' for help"
+  help_message = "pass '--help' for help\n"
 }, arg.command("uptg", ...))
 
 condense(opts)
@@ -46,7 +45,7 @@ Copyright (c) 2022 ULOS Developers under the GNU GPLv3.
 ]]):format(usage))
 end
 
-local dest = unistd.getcwd()
+local dest
 
 if args[2] then
   if fs.isDirectory(args[2]) then
