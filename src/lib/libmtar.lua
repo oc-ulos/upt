@@ -35,11 +35,20 @@ local function readFileTags(handle, tagsize)
     tags[tag_name] = tag_data
   end
 
+  if tags.mtime then
+    tags.mtime = string.unpack("<I"..#tags.mtime, tags.mtime)
+  end
+
+  if tags.mode then
+    tags.mode = string.unpack("<I"..#tags.mode, tags.mode)
+  end
+
   return tags
 end
 
 local function readFileRecord(handle)
-  local recsize = readint(handle, 8)
+  local recsize = pcall(readint, handle, 8)
+  if not recsize then return end
   local name_length = readint(handle, 1)
   local name = handle:read(name_length)
   local tagsize = readint(handle, 2)
@@ -132,19 +141,24 @@ function writer:add(file, path)
     },
   }
 
-  self:create(record, statx.st_size)
+  if stat.S_ISDIR(statx.st_mode) ~= 0 then
+    self:create(record, 0)
+  else
 
-  local handle, oerr = io.open(file, "r")
-  if not handle then
-    error("add " .. file .. ": " .. oerr)
+    self:create(record, statx.st_size)
+
+    local handle, oerr = io.open(file, "r")
+    if not handle then
+      error("add " .. file .. ": " .. oerr)
+    end
+
+    repeat
+      local data = handle:read(statx.st_blksize)
+      if data then self.stream:write(data) end
+    until not data
+
+    handle:close()
   end
-
-  repeat
-    local data = handle:read(statx.st_blksize)
-    if data then self.stream:write(data) end
-  until not data
-
-  handle:close()
 
   return true
 end
@@ -170,7 +184,7 @@ function writer:create(record, datsize)
     end
 
     local tag = string.pack("<s1s2", k, v)
-    tags = tags .. string.pack("<I2", #tag) .. tag
+    tags = tags .. string.pack("<I2", #tag + 2) .. tag
   end
 
   self.stream:write(string.pack("<I8s1s2I8",

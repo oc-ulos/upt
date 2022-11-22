@@ -1,14 +1,16 @@
 #!/usr/bin/env lua
 -- upti - install UPT packages
 
-local upt = require("upt")
-local arg = require("argcompat")
 local getopt = require("getopt")
+local arg = require("argcompat")
+local upt = require("upt")
+local fs = require("upt.filesystem")
 
 local options, usage, condense = getopt.build {
   { "Be verbose", false, "V", "verbose" },
   { "\tBe colorful", false, "c", "color" },
   { "Only do dependency checks", false, "d", "depcheck" },
+  { "Assume dependencies are installed", false, "D", "nodepcheck" },
   { "Alternative root filesystem", "PATH", "r", "rootfs" },
   { "Show UPT version", false, "v", "version" },
   { "\tDisplay this help message", false, "h", "help" }
@@ -27,8 +29,7 @@ require("upt.logger").setColored(opts.c)
 local function showUsage()
   io.stderr:write(([[
 usage: upti <file ...>
-Installs given packages.  All FILE arguments must be absolute paths to local
-files.
+Installs given packages.  Arguments may be repository packages or local files.
 
 options:
 %s
@@ -43,6 +44,10 @@ if opts.v then
   os.exit(0)
 end
 
+if opts.d and opts.D then
+  return upt.throw("-d and -D are mutually exclusive")
+end
+
 if #args == 0 or opts.h then
   showUsage()
 end
@@ -50,7 +55,16 @@ end
 local installer = require("upt.tools.install")
 
 for i=1, #args do
-  local result = installer.install(args[i], opts.r, opts.d)
+  local func
+  if args[i]:sub(-5) == ".mtar" and fs.exists(args[i]) then
+    func = installer.install_local
+  else
+    func = installer.install_repo
+  end
+
+  local result = func(args[i], opts.r,
+      (opts.d and 1) or (opts.D and 2) or 0)
+
   if type(result) == "table" then
     print("package " .. args[i] .. " requires:\n  ",
       table.concat(result, "\n  "))

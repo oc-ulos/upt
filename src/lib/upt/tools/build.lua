@@ -121,7 +121,7 @@ function lib.build(options)
     options.depends or "", options.license or "", options.description)
 
   writer:create({
-    name = "/.meta",
+    name = "/meta",
     tags = {
       mtime = os.time(),
       -- mode r--r--r--

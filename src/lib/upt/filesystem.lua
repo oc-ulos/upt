@@ -25,7 +25,7 @@ function lib.isDirectory(file)
 end
 
 function lib.makeDirectory(file)
-  stat.mkdir(file, 0x1FF)
+  return stat.mkdir(file, 0x1FF)
 end
 
 --- Combine file paths
