@@ -202,6 +202,7 @@ end
 
 --- Install a package from a repository.
 function lib.install_repo(name, root, depcheck_mode)
+  logger.ok("downloading package '%s'", name)
   local get = require("upt.tools.get").get
   root = root or "/"
   fs.makeDirectory(fs.combine(root, "/etc/upt/cache/"))
