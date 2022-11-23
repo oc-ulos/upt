@@ -225,6 +225,8 @@ function lib.install_repo(name, root, depcheck_mode)
   lib.install_local(ok, root, depcheck_mode)
 
   os.remove(ok)
+
+  return true
 end
 
 return lib

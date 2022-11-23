@@ -72,6 +72,8 @@ function lib.verify(options)
       return nil, string.format("missing build config key - '%s'", k)
     end
   end
+
+  return true
 end
 
 function lib.build(options)
@@ -142,7 +144,7 @@ function lib.build(options)
     os.execute("rm -r ./temp")
   end
 
-  return meta
+  return mdata
 end
 
 return lib
