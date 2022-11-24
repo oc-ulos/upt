@@ -160,6 +160,11 @@ function lib.install_local(file, root, depcheck_mode)
         until ds == 0
 
         whandle:close()
+
+        -- ensure that file permissions are correct
+        if tags.mode then
+          stat.chmod(path, tags.mode)
+        end
       end
 
     elseif file:sub(1, 5) == "/post" then -- postinstall script
