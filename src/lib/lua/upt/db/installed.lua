@@ -31,6 +31,7 @@ function dbo:retrieve(search, match, full)
     if search == file or (match and file:match(search)) then
       local hand = assert(io.open(fs.combine(dir, file), "r"))
       local first = hand:read("l")
+      hand:close()
 
       local version, authors, depends, license, repo, desc =
         table.unpack(meta.split(first))
