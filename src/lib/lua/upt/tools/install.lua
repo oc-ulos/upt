@@ -70,6 +70,7 @@ function lib.install_local(file, root, depcheck_mode)
 
   local metadata = { reader:seek("/meta") }
   if #metadata == 0 then
+    handle:close()
     return nil, string.format("package '%s' is missing /meta", file)
   end
 
@@ -88,11 +89,14 @@ function lib.install_local(file, root, depcheck_mode)
     local depends = depcheck(metadata[1], db, metadata[5])
 
     if #depends > 0 then
+      db:close()
+      handle:close()
       return nil, string.format("unmet dependencies: %s",
         table.concat(depends, ", "))
     end
 
   elseif depcheck_mode == 1 then -- depcheck mode 1: return unmet dependencies
+    handle:close()
     return depcheck(metadata[1], db, metadata[5])
 
   elseif depcheck_mode == 2 then -- depcheck mode 2: skip dependency checking
@@ -110,6 +114,7 @@ function lib.install_local(file, root, depcheck_mode)
     metadata[6], "local", metadata[7])
 
   if not _ then
+    handle:close()
     return nil, datapath
   end
 
@@ -121,6 +126,7 @@ function lib.install_local(file, root, depcheck_mode)
 
   local dbhandle, dberr = io.open(datapath, "a")
   if not dbhandle then
+    handle:close()
     return nil, dberr
   end
 
@@ -138,6 +144,8 @@ function lib.install_local(file, root, depcheck_mode)
         end)
 
         if not result and eno ~= errno.EEXIST then
+          handle:close()
+          dbhandle:close()
           return nil, "Directory creation failed: " .. derr
         end
 
