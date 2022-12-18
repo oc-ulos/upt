@@ -17,7 +17,7 @@ function lib.parse(ver)
 
   local components
   if ver:match("-") then
-    components = {ver:match("([^%-]+)(%-)(.+)")}
+    components = {ver:match("([^%-]+)%-(.+)")}
   else
     components = {ver}
   end
@@ -30,9 +30,25 @@ function lib.parse(ver)
     c1[#c1+1] = tonumber(num)
   end
 
+  setmetatable(c1, {__info = components[2]})
+
   components[1] = c1
 
   return table.unpack(components)
+end
+
+-- returns whether version v1 is GREATER than version v2
+-- compared by first numbers back, so:
+-- 0.2 > 0.1
+-- 4.0.1 > 4.0
+-- 4.5 > 4.0.1
+-- 6.3.4 > 6.2.8.7
+function lib.compare(v1, v2)
+  for i=1, math.min(#v1, #v2) do
+    if v1[i] > v2[i] then return true end
+    if v1[i] < v2[i] then return false end
+  end
+  return #v1 > #v2 or getmetatable(v1).__info > getmetatable(v2).__info
 end
 
 return lib
