@@ -200,7 +200,7 @@ function lib.install_local(file, root, depcheck_mode)
       logger.fail("load error: %s", lerr)
     else
 
-      local ok, perr = pcall(func)
+      local ok, perr = pcall(func, root)
       if not ok and perr then
         logger.fail("script error: %s", perr)
       end
