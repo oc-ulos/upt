@@ -21,7 +21,7 @@ function lib.retrieve(url, file)
 
   handle:write(data):close()
 
-  return true
+  return #data
 end
 
 return lib

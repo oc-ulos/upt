@@ -20,15 +20,20 @@ function lib.retrieve(url, file)
     return nil, werr
   end
 
+  local written = 0
+
   repeat
     local chunk = sys.read(fd, 4096)
-    if chunk then handle:write(chunk) end
+    if chunk then
+      written = written + #chunk
+      handle:write(chunk)
+    end
   until not chunk
 
   handle:close()
   sys.close(fd)
 
-  return true
+  return written
 end
 
 return lib

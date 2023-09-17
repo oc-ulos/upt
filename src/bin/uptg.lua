@@ -43,6 +43,7 @@ options:
 
 Copyright (c) 2022 ULOS Developers under the GNU GPLv3.
 ]]):format(usage))
+  os.exit(1)
 end
 
 local dest
