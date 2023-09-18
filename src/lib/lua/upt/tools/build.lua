@@ -139,7 +139,7 @@ function lib.build(options)
     + #(options.depends or "")
     + #(options.license or "")
     + #options.description
-    + 55 + (options.post and 2 or 0)
+    + 55 + (options.post and 1 or 0)
   size = size + #tostring(size)
   local mdata = meta.assemble(--string.format("%s %s %d:%s:%s:%s:%s",
     options.name, options.version, size, options.authors,
