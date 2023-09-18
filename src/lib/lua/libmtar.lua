@@ -141,6 +141,8 @@ function writer:add(file, path)
     },
   }
 
+  print("add", path, statx.st_size)
+
   if stat.S_ISDIR(statx.st_mode) ~= 0 then
     self:create(record, 0)
   else

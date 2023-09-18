@@ -133,7 +133,6 @@ function lib.install_local(file, root, depcheck_mode)
   logger.ok("extracting package")
   for _, name, tags, ds in reader:iterate() do
     if name == "/meta" then break end
-    print(name, tags, ds)
 
     -- literal file for the filesystem
     if name:sub(1, 6) == "/files" then
@@ -176,8 +175,9 @@ function lib.install_local(file, root, depcheck_mode)
         end
       end
 
-    elseif file:sub(1, 5) == "/post" then -- postinstall script
+    elseif name:sub(1, 5) == "/post" then -- postinstall script
       postinstalls[#postinstalls+1] = { name, handle:seek("cur"), ds }
+      handle:seek("cur", ds)
     end
   end
 
