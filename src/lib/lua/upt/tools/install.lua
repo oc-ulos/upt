@@ -75,18 +75,20 @@ function lib.install_local(file, root, depcheck_mode)
   end
 
   -- read and parse metadata from the package
-  metadata = meta.split(handle:read(metadata[4]))
-  if metadata[4] == "" then metadata[4] = {} end
-  if type(metadata[4]) == "string" then metadata[4] = {metadata[4]} end
+  metadata = meta.split(handle:read(metadata[4]), "package")
+  if metadata.authors == "" then metadata.authors = {} end
+  if type(metadata.authors) == "string" then
+    metadata.authors = {metadata.authors} end
 
-  if metadata[5] == "" then metadata[5] = {} end
-  if type(metadata[5]) == "string" then metadata[5] = {metadata[5]} end
+  if metadata.depends == "" then metadata.depends = {} end
+  if type(metadata.depends) == "string" then
+    metadata.depends = {metadata.depends} end
 
   local db = installed.load(root)
 
   logger.ok("checking dependencies")
   if depcheck_mode == 0 then -- depcheck mode 0: error on unmet dependencies
-    local depends = depcheck(metadata[1], db, metadata[5])
+    local depends = depcheck(metadata.name, db, metadata.depends)
 
     if #depends > 0 then
       db:close()
@@ -97,7 +99,7 @@ function lib.install_local(file, root, depcheck_mode)
 
   elseif depcheck_mode == 1 then -- depcheck mode 1: return unmet dependencies
     handle:close()
-    return depcheck(metadata[1], db, metadata[5])
+    return depcheck(metadata.name, db, metadata.depends)
 
   elseif depcheck_mode == 2 then -- depcheck mode 2: skip dependency checking
     logger.warn("installing package '%s' without checking dependencies", file)
@@ -108,10 +110,10 @@ function lib.install_local(file, root, depcheck_mode)
 
   local postinstalls = {}
 
-  db:remove(metadata[1])
+  db:remove(metadata.name)
   local _, datapath = db:add(
-    metadata[1], metadata[2], metadata[4], metadata[5],
-    metadata[6], "local", metadata[7])
+    metadata.name, metadata.version, metadata.authors, metadata.depends,
+    metadata.license, "local", metadata.description)
 
   if not _ then
     handle:close()
