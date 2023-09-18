@@ -133,6 +133,7 @@ function lib.install_local(file, root, depcheck_mode)
   logger.ok("extracting package")
   for _, name, tags, ds in reader:iterate() do
     if name == "/meta" then break end
+    print(name, tags, ds)
 
     -- literal file for the filesystem
     if name:sub(1, 6) == "/files" then
