@@ -38,7 +38,7 @@ function lib.get(name, dest, root)
   local ok, nerr = net.retrieve(
     baseurl .. "/" .. pkgname .. "-" .. pkgver .. ".mtar", dest)
 
-  if not ok or ok ~= entries[1][4] then
+  if not ok or ok ~= tonumber(entries[1][4]) then
     return nil, nerr or "Invalid package size ("..ok.." vs "..entries[1][4]..")"
   end
 
