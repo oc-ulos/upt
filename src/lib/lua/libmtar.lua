@@ -180,7 +180,7 @@ function writer:create(record, datsize)
   local tags = ""
   for k, v in pairs(record.tags) do
     if type(v) == "number" then
-      v = string.pack("<I"..countBytes(v), v)
+      v = string.pack("<I"..bytes(v), v)
     end
 
     local tag = string.pack("<s1s2", k, v)

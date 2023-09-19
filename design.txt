@@ -85,4 +85,4 @@ packages are simple mtar (extended to support empty directories and whatnot, ver
   directory 'post/'
     postinstall scripts, run in sorted order
   file 'meta'
-    package version info, in the same format as package lists
+    package version info, in the same format as package lists sans size

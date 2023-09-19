@@ -14,7 +14,16 @@ end
 
 lib.split_on = split_on
 
-function lib.split(meta)
+local defs = {
+  package_list = {"name", "version", "size", "authors",
+    "depends", "license", "description"},
+  package = {"name", "version", "authors",
+    "depends", "license", "description"},
+  installed = {"version", "authors", "depends",
+    "license", "repo", "description"}
+}
+
+function lib.split(meta, names)
   local split = split_on(meta, ":")
 
   for i=1, #split do
@@ -23,7 +32,15 @@ function lib.split(meta)
     end
   end
 
-  return split
+  if names and defs[names] then
+    local named = {}
+    for i=1, #defs[names] do
+      named[defs[names][i]] = split[i]
+    end
+    return named
+  else
+    return split
+  end
 end
 
 function lib.assemble(...)

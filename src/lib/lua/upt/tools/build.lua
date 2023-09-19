@@ -20,7 +20,8 @@ local valid = {
   description = true,
   srcdir = true,
   preproc = true,
-  prebuild = true
+  prebuild = true,
+  post = true
 }
 
 local optional = {
@@ -28,6 +29,7 @@ local optional = {
   license = true,
   preproc = true,
   prebuild = true,
+  post = true
 }
 
 local function verify_string(x)
@@ -47,7 +49,8 @@ local verifiers = {
   description = verify_string,
   srcdir = function(_) return true end,--relative_exists,
   prebuild = relative_exists,
-  preproc = relative_exists
+  preproc = relative_exists,
+  post = relative_exists
 }
 
 local lib = {}
@@ -120,9 +123,17 @@ function lib.build(options)
     writer:add(file, fs.combine("/files/", base))
   end
 
-  local size = out:seek("cur")
-  local mdata = meta.assemble(--string.format("%s %s %d:%s:%s:%s:%s",
-    options.name, options.version, size, options.authors,
+  if options.post then
+    local posts = tree("./" .. options.post)
+    for i=1, #posts do
+      local file = posts[i]
+      local base = file:sub(#options.post + 3)
+      writer:add(file, fs.combine("/post/", base))
+    end
+  end
+
+  local pkg_mdata = meta.assemble(
+    options.name, options.version, options.authors,
     options.depends or "", options.license or "", options.description)
 
   writer:create({
@@ -135,8 +146,13 @@ function lib.build(options)
               stat.S_IRGRP |
               stat.S_IROTH
       }
-    }, #mdata)
-  out:write(mdata)
+    }, #pkg_mdata)
+  out:write(pkg_mdata)
+
+  local size = out:seek("cur")
+  local mdata = meta.assemble(
+    options.name, options.version, size, options.authors,
+    options.depends or "", options.license or "", options.description)
 
   writer:close()
 

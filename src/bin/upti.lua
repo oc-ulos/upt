@@ -11,6 +11,7 @@ local options, usage, condense = getopt.build {
   { "\tBe colorful", false, "c", "color" },
   { "Only do dependency checks", false, "d", "depcheck" },
   { "Assume dependencies are installed", false, "D", "nodepcheck" },
+  { "Invoke 'uptl' before attempting installation", false, "l", "lists" },
   { "Alternative root filesystem", "PATH", "r", "rootfs" },
   { "Show UPT version", false, "v", "version" },
   { "\tDisplay this help message", false, "h", "help" }
@@ -50,6 +51,10 @@ end
 
 if #args == 0 or opts.h then
   showUsage()
+end
+
+if opts.l then
+  require("upt.tools.list").update(opts.r, {})
 end
 
 local installer = require("upt.tools.install")
