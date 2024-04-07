@@ -153,6 +153,14 @@ function lib.install_local(file, root, depcheck_mode)
 
       else
         local path = fs.combine(root, name:sub(7))
+        local skip = false
+        if name:sub(7):match("^/?etc") then -- TODO: perhaps have a way to *mark* files as configs?
+          if fs.exists(path) then
+            logger.warn("file '%s' installed as '%s.new'", path, path)
+            path = path .. ".new"
+          end
+        end
+
         local whandle, werr = io.open(path, "w")
 
         if not whandle then
