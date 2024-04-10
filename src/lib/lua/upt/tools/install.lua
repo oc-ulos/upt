@@ -86,7 +86,7 @@ function lib.install_local(file, root, depcheck_mode)
 
   local db = installed.load(root)
 
-  logger.ok("checking dependencies")
+  --logger.ok("checking dependencies")
   if depcheck_mode == 0 then -- depcheck mode 0: error on unmet dependencies
     local depends = depcheck(metadata.name, db, metadata.depends)
 
@@ -132,7 +132,7 @@ function lib.install_local(file, root, depcheck_mode)
     return nil, dberr
   end
 
-  logger.ok("extracting package")
+  --logger.ok("extracting package")
   for _, name, tags, ds in reader:iterate() do
     if name == "/meta" then break end
 
@@ -193,7 +193,9 @@ function lib.install_local(file, root, depcheck_mode)
 
   dbhandle:close()
 
-  logger.ok("running postinstall scripts")
+  if #postinstalls > 0 then
+    logger.ok("running postinstall scripts")
+  end
 
   table.sort(postinstalls, function(a, b)
     return a[1] < b[1]
@@ -218,7 +220,7 @@ function lib.install_local(file, root, depcheck_mode)
     end
   end
 
-  logger.ok("cleaning up")
+  --logger.ok("cleaning up")
   handle:close()
 
   return true
