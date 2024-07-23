@@ -6,16 +6,16 @@ local lib = {}
 
 local prefixes = {
   ok   = {
-    color = "\27[97m[  \27[92mOK\27[97m  ] ",
-    standard = "[  OK  ] "
+    color = "\27[92m*\27[97m ",
+    standard = "* "
   },
   warn = {
-    color = "\27[97m[ \27[93mWARN\27[97m ] ",
-    standard = "[ WARN ] "
+    color = "\27[93m!\27[97m ",
+    standard = "! "
   },
   fail = {
-    color = "\27[97m[ \27[91mFAIL\27[97m ] ",
-    standard = "[ FAIL ] "
+    color = "\27[91mX\27[97m ",
+    standard = "X "
   },
 }
 
